@@ -31,6 +31,10 @@ export class Reconnect {
     this.perform = this.perform.bind(this);
   }
 
+  get isStarted(): boolean {
+    return this.state.attempts > this.initialState.attempts;
+  }
+
   canApply(code: TCloseEventCode): boolean {
     return this.skipCloseEventCodes.indexOf(code) === -1;
   }

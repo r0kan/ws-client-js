@@ -21,7 +21,7 @@ export class WsServer {
     return new WsServer(server);
   }
 
-  private readonly connections: WebSocketLib[] = [];
+  private connections: WebSocketLib[] = [];
 
   private constructor(private readonly server: WebSocketLib.Server) {
     this.server.on('connection', connection => {
@@ -48,5 +48,10 @@ export class WsServer {
 
   close(): void {
     this.server.close();
+  }
+
+  closeConnections(code?: number): void {
+    this.connections.forEach(i => i.close(code, 'asd'));
+    this.connections = [];
   }
 }

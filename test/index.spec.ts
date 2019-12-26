@@ -2,7 +2,7 @@
 import { WsServer } from './WsServer';
 
 // lib
-import { Connection, JsonSerializer, IConnection } from '../.';
+import { Connection, JsonSerializer, IConnection, STATUS, CLOSE_EVENT_CODE } from '../.';
 
 const wsUrl = 'ws://127.0.0.1:8080';
 
@@ -14,7 +14,7 @@ const wait = (time: number) =>
     setTimeout(resolve, time);
   });
 
-describe('websocket-js', () => {
+describe('ws-client-js', () => {
   let wsServer: WsServer;
   let connection: IConnection<unknown>;
 
@@ -75,5 +75,67 @@ describe('websocket-js', () => {
     expect(onCloseFn).toBeCalledTimes(1);
 
     wsServer = await WsServer.create(wsUrl);
+  });
+
+  test('reconnect should work', async () => {
+    const onReopenFn: jest.Mock = jest.fn();
+    const onCloseFn: jest.Mock = jest.fn();
+
+    const connection = new Connection(new JsonSerializer(), {
+      url: wsUrl,
+      reconnect: {
+        delay: 1000,
+        delayIncreaseType: 'default',
+        attempts: 4,
+        skipCloseEventCodes: [CLOSE_EVENT_CODE.NORMAL],
+      },
+    });
+
+    connection.onReopen(onReopenFn);
+    connection.onClose(onCloseFn);
+    connection.connect();
+
+    await wait(100);
+
+    expect(connection.status).toBe(STATUS.OPEN);
+
+    wsServer.closeConnections(CLOSE_EVENT_CODE.UNSUPPORTED_DATA);
+
+    await wait(100);
+
+    expect(connection.status).toBe(STATUS.OPEN);
+
+    await wait(1000);
+
+    expect(onReopenFn).toBeCalledTimes(1);
+    expect(onCloseFn).toBeCalledTimes(0);
+  });
+
+  test("reconnect should don't work with skipCloseEventCodes", async () => {
+    const onCloseFn: jest.Mock = jest.fn();
+
+    const connection = new Connection(new JsonSerializer(), {
+      url: wsUrl,
+      reconnect: {
+        delay: 1000,
+        delayIncreaseType: 'default',
+        attempts: 4,
+        skipCloseEventCodes: [CLOSE_EVENT_CODE.NORMAL],
+      },
+    });
+
+    connection.onClose(onCloseFn);
+    connection.connect();
+
+    await wait(100);
+
+    expect(connection.status).toBe(STATUS.OPEN);
+
+    wsServer.closeConnections(CLOSE_EVENT_CODE.NORMAL);
+
+    await wait(100);
+
+    expect(connection.status).toBe(STATUS.CLOSED);
+    expect(onCloseFn).toBeCalledTimes(1);
   });
 });

@@ -145,12 +145,9 @@ export class Connection<TMessage> implements IConnection<TMessage> {
 
   private handleOpen(event: Event): void {
     this.status = STATUS.OPEN;
-    if (this.reconnect) {
-      this.reconnect.stop();
-    }
-    this.resend();
 
-    if (this.error) {
+    if (this.reconnect && this.reconnect.isStarted) {
+      this.reconnect.stop();
       this.error = null;
       this.notifyListeners(EVENT_TYPE.REOPEN);
       this.log('socket reopened', event);
@@ -158,6 +155,8 @@ export class Connection<TMessage> implements IConnection<TMessage> {
       this.notifyListeners(EVENT_TYPE.OPEN);
       this.log('socket opened', event);
     }
+
+    this.resend();
   }
 
   private handleError(error: Event): void {
@@ -177,7 +176,7 @@ export class Connection<TMessage> implements IConnection<TMessage> {
   private handleReconnectEnd(): void {
     this.status = STATUS.CLOSED;
     this.disconnect({
-      code: 1000,
+      code: CLOSE_EVENT_CODE.NORMAL,
       reason: 'Reconnect failed',
     });
   }
