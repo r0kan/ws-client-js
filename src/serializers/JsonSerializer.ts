@@ -1,4 +1,4 @@
-import { ISerializer } from 'typing/interfaces';
+import { ISerializer } from '../typing/interfaces';
 
 export class JsonSerializer<TDeSerializedData> implements ISerializer<TDeSerializedData> {
   serialize<T = unknown>(data: T): string {

@@ -8,7 +8,7 @@
     "messages"
   ],
   "license": "MIT",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
   "typings": "dist/index.d.ts",
@@ -29,22 +29,23 @@
     "build": "rm -rf dist/* && rollup -c",
     "test": "jest",
     "type:check": "tsc -p tsconfig.json --noEmit",
-    "check:deps": "npx npm-check-updates -u"
+    "check:deps": "npm-check-updates -u"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/preset-typescript": "^7.7.7",
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
     "@types/jest": "^24.0.25",
     "@types/ws": "^6.0.4",
     "jest": "^24.9.0",
+    "npm-check-updates": "^4.0.1",
     "prettier": "^1.19.1",
-    "rollup": "^1.27.14",
+    "rollup": "^1.29.0",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-terser": "^5.1.3",
+    "rollup-plugin-terser": "^5.2.0",
     "rollup-plugin-typescript2": "^0.25.3",
     "rollup-pluginutils": "^2.8.2",
-    "ts-jest": "^24.2.0",
+    "ts-jest": "^24.3.0",
     "typescript": "^3.7.4",
     "ws": "^7.2.1"
   }
